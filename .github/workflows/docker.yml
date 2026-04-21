@@ -1,0 +1,26 @@
+name: Docker CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        run: docker build ./api -t api
+
+      - name: Build Worker image
+        run: docker build ./worker -t worker
+
+      - name: Build Frontend image
+        run: docker build ./frontend -t frontend
