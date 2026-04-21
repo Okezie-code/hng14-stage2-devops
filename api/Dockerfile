@@ -3,7 +3,9 @@ FROM python:3.11-slim
 # Create app directory
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y curl
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install dependencies
 COPY requirements.txt .
