@@ -1,24 +1,26 @@
-# Stage 1: Build
-FROM python:3.11-slim AS builder
+FROM python:3.11-slim
 
+# Create app directory
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y curl
+
+# Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Stage 2: Final
-FROM python:3.11-slim
-
-WORKDIR /app
-
-COPY --from=builder /usr/local /usr/local
+# Copy app code
 COPY . .
 
 # Create non-root user
 RUN useradd -m appuser
 USER appuser
 
+# Expose port
+EXPOSE 8000
+
 # Healthcheck
 HEALTHCHECK CMD curl --fail http://localhost:8000/docs || exit 1
 
+# Start app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

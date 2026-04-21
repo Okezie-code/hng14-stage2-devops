@@ -6,48 +6,64 @@ services:
     container_name: redis
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   api:
     build: ./api
     container_name: api
     env_file:
       - .env
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     networks:
       - app-network
     ports:
       - "8000:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
 
   worker:
     build: ./worker
     container_name: worker
     env_file:
       - .env
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     networks:
       - app-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
 
   frontend:
     build: ./frontend
     container_name: frontend
     env_file:
       - .env
-    environment:
-      - API_URL=http://api:8000
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     networks:
       - app-network
     ports:
       - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
 
 networks:
   app-network:
+    driver: bridge
