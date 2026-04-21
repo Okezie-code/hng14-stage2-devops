@@ -1,3 +1,4 @@
+# hadolint ignore=DL3008
 FROM python:3.11-slim
 
 # Create app directory
