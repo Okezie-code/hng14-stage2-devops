@@ -1,4 +1,4 @@
-# hadolint ignore=DL3008
+# hadolint ignore=DL3008,DL3009,DL3015
 FROM python:3.11-slim
 
 # Create app directory
