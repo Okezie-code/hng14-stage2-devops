@@ -4,7 +4,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
+    apt-get install -y --no-install-recommends curl=7.88.1-10 && \
     rm -rf /var/lib/apt/lists/*
 
 # Install dependencies
