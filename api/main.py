@@ -5,7 +5,6 @@ import os
 
 app = FastAPI()
 
-
 try:
     r = redis.Redis(
         host=os.getenv("REDIS_HOST", "redis"),
@@ -15,7 +14,6 @@ try:
 except Exception:
     print("Redis not available, using fallback")
     r = None
-
 
 # CREATE JOB
 @app.post("/jobs")
@@ -27,8 +25,6 @@ def create_job():
         r.hset(f"job:{job_id}", "status", "queued")
 
     return {"job_id": job_id}
-
-
 
 @app.get("/jobs/{job_id}")
 def get_job(job_id: str):
@@ -46,4 +42,3 @@ def get_job(job_id: str):
         "job_id": job_id,
         "status": status.decode()
     }
-
