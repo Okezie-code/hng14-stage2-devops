@@ -146,6 +146,14 @@ jobs:
           docker compose pull || true
           docker compose up -d --build
 
+      - name: Start services in CI
+        run: |
+          docker compose up -d
+
+      - name: Tear down
+        if: always()
+        run: docker compose down
+
 
   security:
     runs-on: ubuntu-latest
@@ -157,6 +165,15 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Enable Docker cache
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: temp:cache
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build images again
         run: |
@@ -182,7 +199,8 @@ jobs:
       - name: Scan Frontend image
         run: trivy image --format sarif -o trivy-frontend.sarif frontend:latest
 
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v4
+      - name: Upload SARIF artifact
+        uses: actions/upload-artifact@v4
         with:
-          sarif_file: trivy-api.sarif
+          name: trivy-results
+          path: trivy-api.sarif
