@@ -105,7 +105,7 @@ jobs:
           docker build -t localhost:5000/api:$IMAGE_TAG -t localhost:5000/api:latest ./api
 
           # Worker
-        docker build -t localhost:5000/worker:$IMAGE_TAG -t localhost:5000/worker:latest ./worker
+          docker build -t localhost:5000/worker:$IMAGE_TAG -t localhost:5000/worker:latest ./worker
 
           # Frontend
           docker build -t localhost:5000/frontend:$IMAGE_TAG -t localhost:5000/frontend:latest ./frontend
