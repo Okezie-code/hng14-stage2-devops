@@ -128,6 +128,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
 
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -140,6 +146,12 @@ jobs:
           echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
           sudo apt-get update
           sudo apt-get install -y trivy
+
+      - name: Pull images from registry
+        run: |
+          docker pull localhost:5000/api:latest
+          docker pull localhost:5000/worker:latest
+          docker pull localhost:5000/frontend:latest
 
       - name: Scan API image
         run: trivy image --exit-code 1 --severity CRITICAL localhost:5000/api:latest
