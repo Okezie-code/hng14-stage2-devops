@@ -79,7 +79,7 @@ jobs:
       - name: Run tests
         run: |
           export PYTHONPATH=.
-          pytest --cov=api --cov-report=xml
+          pytest --cov=api --cov-report=xml --maxfail=1 --disable-warnings --timeout=10
 
       - name: Upload coverage
         uses: actions/upload-artifact@v4
