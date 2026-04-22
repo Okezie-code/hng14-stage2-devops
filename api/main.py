@@ -41,7 +41,7 @@ def create_job():
 
         def process_job():
             r.hset(f"job:{job_id}", "status", "processing")
-            time.sleep(2)
+            time.sleep(0.5)
             r.hset(f"job:{job_id}", "status", "completed")
 
         threading.Thread(target=process_job).start()
@@ -51,7 +51,7 @@ def create_job():
 
         def process_job():
             fake_db[job_id] = "processing"
-            time.sleep(2)
+            time.sleep(0.5)
             fake_db[job_id] = "completed"
 
         threading.Thread(target=process_job).start()
