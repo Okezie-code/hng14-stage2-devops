@@ -1,29 +1,29 @@
-# hadolint ignore=DL3008,DL3009,DL3015
-FROM python:3.11-slim
+# --------- BUILD STAGE ---------
+FROM python:3.11-alpine AS builder
 
-# Create app directory
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache gcc musl-dev libffi-dev
 
-# Install dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-# Copy app code
+
+# --------- FINAL STAGE ---------
+FROM python:3.11-alpine
+
+WORKDIR /app
+
+# create non-root user
+RUN adduser -D appuser
+
+COPY --from=builder /install /usr/local
 COPY . .
 
-# Create non-root user
-RUN useradd -m appuser
 USER appuser
 
-# Expose port
 EXPOSE 8000
 
-# Healthcheck
-HEALTHCHECK CMD curl --fail http://localhost:8000/docs || exit 1
+HEALTHCHECK CMD wget -qO- http://localhost:8000/docs || exit 1
 
-# Start app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

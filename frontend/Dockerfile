@@ -1,23 +1,27 @@
-FROM node:20-alpine
+# --------- BUILD STAGE ---------
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies
-COPY package.json .
+COPY package*.json ./
 RUN npm install
 
-# Copy app code
 COPY . .
 
-# Create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# --------- FINAL STAGE ---------
+FROM node:18-alpine
+
+WORKDIR /app
+
+RUN adduser -D appuser
+
+COPY --from=builder /app /app
+
 USER appuser
 
-# Expose port
 EXPOSE 3000
 
-# Healthcheck
-HEALTHCHECK CMD wget --spider http://localhost:3000 || exit 1
+HEALTHCHECK CMD wget -qO- http://localhost:3000 || exit 1
 
-# Start app
-CMD ["node", "app.js"]
+CMD ["npm", "start"]
