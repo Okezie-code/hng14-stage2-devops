@@ -5,7 +5,6 @@ import os
 
 app = FastAPI()
 
-
 fake_db = {}
 
 
@@ -23,12 +22,10 @@ def get_redis():
         return None
 
 
-r = get_redis()
-
-
 @app.post("/jobs")
 def create_job():
     job_id = str(uuid.uuid4())
+    r = get_redis()
 
     if r:
         r.lpush("job", job_id)
@@ -41,6 +38,7 @@ def create_job():
 
 @app.get("/jobs/{job_id}")
 def get_job(job_id: str):
+    r = get_redis()
 
     if r:
         job = r.hgetall(f"job:{job_id}")
