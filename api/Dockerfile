@@ -14,6 +14,8 @@ FROM python:3.11-alpine
 
 WORKDIR /app
 
+Run apk add --no-cache wget
+
 # create non-root user
 RUN adduser -D appuser
 
