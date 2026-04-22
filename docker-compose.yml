@@ -2,25 +2,63 @@ version: "3.9"
 
 services:
   redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
+    image: redis:7-alpine
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   api:
     build: ./api
     ports:
       - "8000:8000"
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_HOST: redis
+    networks:
+      - app-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   worker:
     build: ./worker
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_HOST: redis
+    networks:
+      - app-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   frontend:
     build: ./frontend
     ports:
       - "3000:3000"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
+    environment:
+      API_URL: http://api:8000
+    networks:
+      - app-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+networks:
+  app-network:
