@@ -6,6 +6,9 @@ import os
 app = FastAPI()
 
 
+fake_db = {}
+
+
 def get_redis():
     try:
         r = redis.Redis(
@@ -30,23 +33,35 @@ def create_job():
     if r:
         r.lpush("job", job_id)
         r.hset(f"job:{job_id}", "status", "queued")
+    else:
+        fake_db[job_id] = "queued"
 
     return {"job_id": job_id}
 
 
 @app.get("/jobs/{job_id}")
 def get_job(job_id: str):
-    if not r:
-        return {"error": "not found"}
 
-    job = r.hgetall(f"job:{job_id}")
+    if r:
+        job = r.hgetall(f"job:{job_id}")
 
-    if job == {}:
-        return {"error": "not found"}
+        if job == {}:
+            return {"error": "not found"}
 
-    status = job.get(b"status")
+        status = job.get(b"status")
 
-    return {
-        "job_id": job_id,
-        "status": status.decode() if status else "unknown"
-    }
+        return {
+            "job_id": job_id,
+            "status": status.decode() if status else "unknown"
+        }
+
+    else:
+        status = fake_db.get(job_id)
+
+        if not status:
+            return {"error": "not found"}
+
+        return {
+            "job_id": job_id,
+            "status": status
+        }
