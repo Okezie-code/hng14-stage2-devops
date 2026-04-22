@@ -44,7 +44,7 @@ def create_job():
             time.sleep(2)
             r.hset(f"job:{job_id}", "status", "completed")
 
- threading.Thread(target=process_job).start()
+        threading.Thread(target=process_job).start()
 
     else:
         fake_db[job_id] = "queued"
