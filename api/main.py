@@ -16,7 +16,6 @@ except Exception:
     r = None
 
 
-
 @app.post("/jobs")
 def create_job():
     job_id = str(uuid.uuid4())
