@@ -36,7 +36,7 @@ def get_job(job_id: str):
 
     status = r.hget(f"job:{job_id}", "status")
 
-    if not status:
+    if status is None:
         return {"error": "not found"}
 
     return {
