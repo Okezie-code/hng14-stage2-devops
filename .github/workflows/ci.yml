@@ -141,6 +141,12 @@ jobs:
           docker push localhost:5000/frontend:$IMAGE_TAG
           docker push localhost:5000/frontend:latest
 
+      - name: Simulate rolling update
+        run: |
+          docker compose pull || true
+          docker compose up -d --build
+
+
   security:
     runs-on: ubuntu-latest
     needs: build
