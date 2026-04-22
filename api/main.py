@@ -5,15 +5,18 @@ import os
 
 app = FastAPI()
 
-try:
-    r = redis.Redis(
-        host=os.getenv("REDIS_HOST", "redis"),
-        port=int(os.getenv("REDIS_PORT", 6379))
-    )
-    r.ping()
-except Exception:
-    print("Redis not available, using fallback")
-    r = None
+
+def get_redis():
+    try:
+        return redis.Redis(
+            host=os.getenv("REDIS_HOST", "redis"),
+            port=int(os.getenv("REDIS_PORT", 6379)),
+            decode_responses=False
+        )
+    except:
+        return None
+
+r = get_redis()
 
 
 @app.post("/jobs")
@@ -29,6 +32,9 @@ def create_job():
 
 @app.get("/jobs/{job_id}")
 def get_job(job_id: str):
+    if not r:
+        return {"error": "not found"}
+
     job = r.hgetall(f"job:{job_id}")
 
     if job == {}:
