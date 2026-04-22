@@ -2,6 +2,8 @@ from fastapi import FastAPI
 import redis
 import uuid
 import os
+import threading
+import time
 
 app = FastAPI()
 
@@ -36,8 +38,22 @@ def create_job():
     if r:
         r.lpush("job", job_id)
         r.hset(f"job:{job_id}", "status", "queued")
+
+
+        def process_job():
+            time.sleep(2)
+            r.hset(f"job:{job_id}", "status", "completed")
+
+        threading.Thread(target=process_job).start()
+
     else:
         fake_db[job_id] = "queued"
+
+        def process_job():
+            time.sleep(2)
+            fake_db[job_id] = "completed"
+
+        threading.Thread(target=process_job).start()
 
     return {"job_id": job_id}
 
