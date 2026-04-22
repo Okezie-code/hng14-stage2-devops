@@ -8,11 +8,14 @@ app = FastAPI()
 
 def get_redis():
     try:
-        return redis.Redis(
+        r = redis.Redis(
             host=os.getenv("REDIS_HOST", "redis"),
             port=int(os.getenv("REDIS_PORT", 6379)),
-            decode_responses=False
+            socket_connect_timeout=1,
+            socket_timeout=1
         )
+        r.ping()
+        return r
     except Exception:
         return None
 
