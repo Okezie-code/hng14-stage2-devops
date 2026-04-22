@@ -13,8 +13,9 @@ def get_redis():
             port=int(os.getenv("REDIS_PORT", 6379)),
             decode_responses=False
         )
-    except:
+    except Exception:
         return None
+
 
 r = get_redis()
 
