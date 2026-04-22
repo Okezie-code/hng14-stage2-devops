@@ -7,7 +7,7 @@ app = FastAPI()
 
 
 r = redis.Redis(
-    host=os.getenv("REDIS_HOST", "localhost"),
+    host=os.getenv("REDIS_HOST", "redis"),
     port=int(os.getenv("REDIS_PORT", 6379))
 )
 

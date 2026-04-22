@@ -23,6 +23,9 @@
     async function submitJob() {
       const res = await fetch('/submit', { method: 'POST' });
       const data = await res.json();
+
+      console.log("RESPONSE:", data);
+
       document.getElementById('result').innerText = `Submitted: ${data.job_id}`;
       jobIds.push(data.job_id);
       pollJob(data.job_id);
