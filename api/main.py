@@ -29,17 +29,14 @@ def create_job():
 
 @app.get("/jobs/{job_id}")
 def get_job(job_id: str):
+    job = r.hgetall(f"job:{job_id}")
 
-    if not r:
-        # fallback for CI (no redis)
-        return {"job_id": job_id, "status": "queued"}
-
-    status = r.hget(f"job:{job_id}", "status")
-
-    if status is None:
+    if job == {}:
         return {"error": "not found"}
+
+    status = job.get(b"status")
 
     return {
         "job_id": job_id,
-        "status": status.decode()
+        "status": status.decode() if status else "unknown"
     }
