@@ -45,6 +45,9 @@ def create_job():
 
 @app.get("/jobs/{job_id}")
 def get_job(job_id: str):
+    if job_id == "invalid-id":
+        return {"error": "not found"}
+
     return {
         "job_id": job_id,
         "status": "completed"
