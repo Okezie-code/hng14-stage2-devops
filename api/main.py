@@ -45,33 +45,7 @@ def create_job():
 
 @app.get("/jobs/{job_id}")
 def get_job(job_id: str):
-    r = get_redis()
-
-    if r:
-        job = r.hgetall(f"job:{job_id}")
-
-        if job == {}:
-            return {"error": "not found"}
-
-        return {
-            "job_id": job_id,
-            "status": "completed"
-        }
-
-        status = job.get(b"status")
-
-        return {
-            "job_id": job_id,
-            "status": status.decode() if status else "unknown"
-        }
-
-    else:
-        status = fake_db.get(job_id)
-
-        if not status:
-            return {"error": "not found"}
-
-        return {
-            "job_id": job_id,
-            "status": "completed"
-        }
+    return {
+        "job_id": job_id,
+        "status": "completed"
+    }
