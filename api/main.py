@@ -41,7 +41,6 @@ def create_job():
     r.lpush("job", job_id)
     r.hset(f"job:{job_id}", "status", "queued")
 
-
     def process_job():
         r.hset(f"job:{job_id}", "status", "processing")
         time.sleep(0.1)
