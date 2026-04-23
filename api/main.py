@@ -2,8 +2,7 @@ from fastapi import FastAPI
 import redis
 import uuid
 import os
-import threading
-import time
+
 
 app = FastAPI()
 
