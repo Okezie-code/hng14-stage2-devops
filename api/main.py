@@ -35,26 +35,19 @@ def create_job():
     job_id = str(uuid.uuid4())
     r = get_redis()
 
-    if r:
-        r.lpush("job", job_id)
-        r.hset(f"job:{job_id}", "status", "queued")
+    if not r:
+        return {"error": "redis unavailable"}
 
-        def process_job():
-            r.hset(f"job:{job_id}", "status", "processing")
-            time.sleep(0.1)
-            r.hset(f"job:{job_id}", "status", "completed")
+    r.lpush("job", job_id)
+    r.hset(f"job:{job_id}", "status", "queued")
 
-        threading.Thread(target=process_job, daemon=True).start()
 
-    else:
-        fake_db[job_id] = "queued"
+    def process_job():
+        r.hset(f"job:{job_id}", "status", "processing")
+        time.sleep(0.1)
+        r.hset(f"job:{job_id}", "status", "completed")
 
-        def process_job():
-            fake_db[job_id] = "processing"
-            time.sleep(0.1)
-            fake_db[job_id] = "completed"
-
-        threading.Thread(target=process_job, daemon=True).start()
+    threading.Thread(target=process_job, daemon=True).start()
 
     return {"job_id": job_id}
 
@@ -63,26 +56,17 @@ def create_job():
 def get_job(job_id: str):
     r = get_redis()
 
-    if r:
-        job = r.hgetall(f"job:{job_id}")
+    if not r:
+        return {"error": "redis unavailable"}
 
-        if job == {}:
-            return {"error": "not found"}
+    job = r.hgetall(f"job:{job_id}")
 
-        status = job.get(b"status")
+    if job == {}:
+        return {"error": "not found"}
 
-        return {
-            "job_id": job_id,
-            "status": status.decode() if status else "unknown"
-        }
+    status = job.get(b"status")
 
-    else:
-        status = fake_db.get(job_id)
-
-        if not status:
-            return {"error": "not found"}
-
-        return {
-            "job_id": job_id,
-            "status": status
-        }
+    return {
+        "job_id": job_id,
+        "status": status.decode() if status else "unknown"
+    }
