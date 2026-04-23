@@ -44,7 +44,7 @@ def create_job():
             time.sleep(0.1)
             r.hset(f"job:{job_id}", "status", "completed")
 
-        threading.Thread(target=process_job, daemon=True).start()
+        threading.Thread(target=process_job).start()
 
     else:
         fake_db[job_id] = "queued"
@@ -54,7 +54,7 @@ def create_job():
             time.sleep(0.1)
             fake_db[job_id] = "completed"
 
-        threading.Thread(target=process_job, daemon=True).start()
+        threading.Thread(target=process_job).start()
 
     return {"job_id": job_id}
 
